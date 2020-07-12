@@ -13,16 +13,14 @@ using System.Web.Http.Cors;
 
 namespace CovidMonitorApi.Controllers
 {
-    [EnableCors( origins: "http://localhost:4200", headers: "*" , methods : "*")]
+    [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class PatientController : ApiController
     {
-        string connectionstring = "Server = DESKTOP-HKSUM9R; initial catalog = CovidMonitor; Integrated Security = True; ";
-        
+        string connectionstring = ConfigurationManager.ConnectionStrings["connectionString"].ToString();
         // GET api/patient
         [HttpGet]
         public List<Patient> GetAll()     
         {
-            //return listEmp.First(e => e.ID == id);  
             List<Patient> patientList = new List<Patient>();
             SqlConnection con = new SqlConnection(connectionstring);
             string sqlquery = "Select * from Patient";
@@ -76,55 +74,84 @@ namespace CovidMonitorApi.Controllers
         }
 
         // POST api/patient
-        public void Post(Patient patient)
+        [HttpPost]
+        public IHttpActionResult Post(Patient patient)
         {
-            List<Patient> patientList = new List<Patient>();
-            SqlConnection con = new SqlConnection(connectionstring);
-            con.Open();
-            string sqlquery = "INSERT INTO Patient (Name,Address,Age,City,Num_Of_Families,Status,Month)" +
-                               "VALUES(@param1,@param2,@param3,@param4,@param5,@param6,@param7)";
+            try 
+            { 
+                SqlConnection con = new SqlConnection(connectionstring);
+                con.Open();
+                string sqlquery = "INSERT INTO Patient (Name,Address,Age,City,Num_Of_Families,Status,Month)" +
+                                   "VALUES(@param1,@param2,@param3,@param4,@param5,@param6,@param7)";
 
-            SqlCommand sqlCommand = new SqlCommand(sqlquery, con);
-            sqlCommand.Parameters.AddWithValue("@param1", patient.Name);
-            sqlCommand.Parameters.AddWithValue("@param2", patient.Address);
-            sqlCommand.Parameters.AddWithValue("@param4", patient.Age);
-            sqlCommand.Parameters.AddWithValue("@param3", patient.City);
-            sqlCommand.Parameters.AddWithValue("@param5", patient.Num_Of_Fam);
-            sqlCommand.Parameters.AddWithValue("@param6", patient.Status);
-            sqlCommand.Parameters.AddWithValue("@param7", patient.Month);
+                SqlCommand sqlCommand = new SqlCommand(sqlquery, con);
 
-            sqlCommand.ExecuteNonQuery();
+                (sqlCommand.Parameters.Add("@param1", SqlDbType.VarChar)).Value = patient.Name.ToString();
+                (sqlCommand.Parameters.Add("@param2", SqlDbType.VarChar)).Value = patient.Address.ToString();
+                (sqlCommand.Parameters.Add("@param3", SqlDbType.Int)).Value = Convert.ToInt32(patient.Age);
+                (sqlCommand.Parameters.Add("@param4", SqlDbType.NChar)).Value = patient.City.ToString();
+                (sqlCommand.Parameters.Add("@param5", SqlDbType.Int)).Value = Convert.ToInt32(patient.Num_Of_Fam);
+                (sqlCommand.Parameters.Add("@param6", SqlDbType.Int)).Value = Convert.ToInt32(patient.Status);
+                (sqlCommand.Parameters.Add("@param7", SqlDbType.NChar)).Value = patient.Month.ToString();
+
+                sqlCommand.ExecuteNonQuery();
+                con.Close();
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }       
+            return StatusCode(HttpStatusCode.OK);
+
         }
 
         // PUT api/patient/id
-        public void Put(int id, Patient patient)
+        public IHttpActionResult Put(int id, Patient patient)
         {
-            SqlConnection con = new SqlConnection(connectionstring);
-            con.Open();
-            string sqlquery = "UPDATE INTO Patient (Name,Address,Age,City,Num_Of_Fam,Status,Month) +" +
-                               "VALUES(@param1,@param2,@param3,@param4,@param5,@param6,@param7)";
+            try
+            {
+                SqlConnection con = new SqlConnection(connectionstring);
+                con.Open();
+                string sqlquery = "UPDATE Patient SET " +
+                                  "Name = @param1,Address = @param2,Age = @param3,City = @param4," +
+                                  "Num_Of_Families = @param5,Status = @param6,Month = @param7 " +
+                                  "Where Id = " + id;
+                SqlCommand sqlCommand = new SqlCommand(sqlquery, con);
+                sqlCommand.Parameters.AddWithValue("@param1", patient.Name);
+                sqlCommand.Parameters.AddWithValue("@param2", patient.Address);
+                sqlCommand.Parameters.AddWithValue("@param3", patient.Age);
+                sqlCommand.Parameters.AddWithValue("@param4", patient.City);
+                sqlCommand.Parameters.AddWithValue("@param5", patient.Num_Of_Fam);
+                sqlCommand.Parameters.AddWithValue("@param6", patient.Status);
+                sqlCommand.Parameters.AddWithValue("@param7", patient.Month);
+                sqlCommand.ExecuteNonQuery();
+                con.Close();
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
+            return StatusCode(HttpStatusCode.OK);
 
-            SqlCommand sqlCommand = new SqlCommand(sqlquery, con);
-            sqlCommand.Parameters.AddWithValue("@param1", patient.Name);
-            sqlCommand.Parameters.AddWithValue("@param2", patient.Address);
-            sqlCommand.Parameters.AddWithValue("@param4", patient.Age);
-            sqlCommand.Parameters.AddWithValue("@param3", patient.City);
-            sqlCommand.Parameters.AddWithValue("@param5", patient.Num_Of_Fam);
-            sqlCommand.Parameters.AddWithValue("@param6", patient.Status);
-            sqlCommand.Parameters.AddWithValue("@param7", patient.Month);
-
-            sqlCommand.ExecuteNonQuery();
         }
 
         // DELETE api/patient/id
-        public void Delete(int id)
+        public IHttpActionResult Delete(int id)
         {
-            SqlConnection con = new SqlConnection(connectionstring);
-            string sqlquery = "Delete From Patient where Id=" + id;
-            con.Open();
-            SqlCommand sqlCommand = new SqlCommand(sqlquery, con);
-            sqlCommand.ExecuteNonQuery();
-            con.Close();
+            try 
+            { 
+                SqlConnection con = new SqlConnection(connectionstring);
+                string sqlquery = "Delete From Patient where Id=" + id;
+                con.Open();
+                SqlCommand sqlCommand = new SqlCommand(sqlquery, con);
+                sqlCommand.ExecuteNonQuery();
+                con.Close();
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
+                return StatusCode(HttpStatusCode.OK);
+            }
         }
-    }
 }

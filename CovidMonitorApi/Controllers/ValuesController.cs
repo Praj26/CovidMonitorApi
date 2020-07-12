@@ -40,8 +40,8 @@ namespace CovidMonitorApi.Controllers
      }
     
 
-    // GET api/values/5
-    public string Get(int id)
+        // GET api/values/5
+        public string Get(int id)
         {
             return "value";
         }

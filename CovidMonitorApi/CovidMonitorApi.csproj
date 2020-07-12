@@ -170,15 +170,16 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
-    <Compile Include="Controllers\LocationGraph.cs" />
+    <Compile Include="Controllers\LocationGraphController.cs" />
     <Compile Include="Controllers\AgeGraph.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\MonthGraph.cs" />
+    <Compile Include="Controllers\MonthGraphController.cs" />
     <Compile Include="Controllers\PatientController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Graph.cs" />
     <Compile Include="Models\Patient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -265,12 +266,6 @@
     <None Include="packages.config" />
     <Content Include="Scripts\jquery-3.4.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.4.1.min.map" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\PatientDataAccess\PatientDataAccess.csproj">
-      <Project>{29d6eb0d-ebf8-489e-8456-86f3099791af}</Project>
-      <Name>PatientDataAccess</Name>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
